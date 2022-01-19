@@ -67,6 +67,8 @@ public class PlayerController : KinematicBody2D
             acceleration = accelerationInAir;
         }
     }
+
+    // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _PhysicsProcess(float delta)
     {
         // Vector2 velocity = new Vector2();
@@ -92,8 +94,14 @@ public class PlayerController : KinematicBody2D
         // MoveAndSlide(velocity, Vector2.Up);
 
 
-
-        velocity.y += gravity * delta;
+        if (!IsOnFloor())
+        {
+            velocity.y += gravity * delta;
+        }
+        else
+        {
+            velocity.y = 1;
+        }
 
         if (health > 0)
         {
@@ -131,7 +139,6 @@ public class PlayerController : KinematicBody2D
         {
             if (Input.IsActionJustPressed("jump"))
             {
-                inAir = true;
                 velocity.y = -jumpPower;
             }
             else

@@ -30,7 +30,7 @@ public class PlayerController : KinematicBody2D
     private int facingDirectionCheck = 0;
     private bool takingDamage = false;
     [Export]
-    private int health;
+    private int health = 1;
 
     // Jump
     private bool inAir = false;

@@ -19,8 +19,9 @@ public class PlayerController : KinematicBody2D
     private int moveSpeed = 150;
     [Export]
     private float friction = .01f;
+    private float acceleration;
     [Export]
-    private float acceleration = .3f;
+    private float accelerationOnGround = .3f;
     [Export]
     private float accelerationInAir = .01f;
 
@@ -31,6 +32,9 @@ public class PlayerController : KinematicBody2D
     private bool takingDamage = false;
     [Export]
     private int health = 1;
+    [Export]
+    private int jumpsInAir;
+    private int jumpsInAirReset;
 
     // Jump
     private bool inAir = false;
@@ -40,20 +44,28 @@ public class PlayerController : KinematicBody2D
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-
+        jumpsInAirReset = jumpsInAir;
     }
 
-     // Called every frame. 'delta' is the elapsed time since the previous frame.
+    // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(float delta)
     {
-        // if (velocity.x == moveSpeed)
-        // {
-        //     moveSpeed += 2;
-        // }
-        // else if (velocity.x == -moveSpeed)
-        // {
-        //     moveSpeed += 2;
-        // }
+        if (velocity.x == moveSpeed)
+        {
+            moveSpeed += 2;
+        }
+        else if (velocity.x == -moveSpeed)
+        {
+            moveSpeed += 2;
+        }
+        if (IsOnFloor())
+        {
+            acceleration = accelerationOnGround;
+        }
+        else
+        {
+            acceleration = accelerationInAir;
+        }
     }
     public override void _PhysicsProcess(float delta)
     {
@@ -81,7 +93,7 @@ public class PlayerController : KinematicBody2D
 
 
 
-        velocity.y += gravity*delta;
+        velocity.y += gravity * delta;
 
         if (health > 0)
         {
@@ -103,11 +115,38 @@ public class PlayerController : KinematicBody2D
             facingDirection += 1;
             facingDirectionCheck += 1;
         }
+
+        if (inAir && jumpsInAir > 0 && Input.IsActionJustPressed("jump"))
+        {
+            jumpsInAir--;
+            velocity.y = -jumpPower;
+        }
+
+        if (IsOnCeiling())
+        {
+            velocity.y = 0;
+        }
+
+        if (IsOnFloor())
+        {
+            if (Input.IsActionJustPressed("jump"))
+            {
+                inAir = true;
+                velocity.y = -jumpPower;
+            }
+            else
+            {
+                jumpsInAir = jumpsInAirReset;
+                inAir = false;
+            }
+        }
+
         if (facingDirection != 0)
         {
             velocity.x = Mathf.Lerp(velocity.x, facingDirection * moveSpeed, acceleration);
         }
-        else {
+        else
+        {
             velocity.x = Mathf.Lerp(velocity.x, 0, friction);
         }
     }

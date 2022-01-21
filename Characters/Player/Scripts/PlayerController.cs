@@ -33,13 +33,13 @@ public class PlayerController : KinematicBody2D
     [Export]
     private int health = 1;
     [Export]
-    private int jumpsInAir;
-    private int jumpsInAirReset;
+    private int jumpsInAir = 2;
+    private int jumpsInAirReset = 2;
 
     // Jump
     private bool inAir = false;
     [Export]
-    private int jumpPower = 200;
+    private int jumpPower = 700;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()

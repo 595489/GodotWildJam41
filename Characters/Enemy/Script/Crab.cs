@@ -30,7 +30,7 @@ public class Crab : KinematicBody2D
       if (!bottomRight.IsColliding()) {
           velocity.x = -speed;
       }
-      else if (!bottomLeft.IsColliding()) {
+      if (!bottomLeft.IsColliding()) {
           velocity.x = speed;
       }
       MoveAndSlide(velocity, Vector2.Up);

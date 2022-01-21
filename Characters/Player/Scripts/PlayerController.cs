@@ -3,14 +3,6 @@ using System;
 
 public class PlayerController : KinematicBody2D
 {
-    // Variables for movement:
-    // private int speed = 800;
-    // private int gravity = 18000;
-    // private int jumpForce = 9000;
-    // private float friction = 0.01f;
-    // private float acceleration = 0.25f;
-    // private float drag = 0.1f;
-    // private float weightAcceleration = 0.3f;
 
     // Base Physics
     [Export]
@@ -27,6 +19,7 @@ public class PlayerController : KinematicBody2D
 
     // Standards
     private Vector2 velocity = new Vector2();
+    private Vector2 previousPos;
     private int facingDirection = 0;
     private int facingDirectionCheck = 0;
     private bool takingDamage = false;
@@ -35,16 +28,18 @@ public class PlayerController : KinematicBody2D
     [Export]
     private int jumpsInAir = 2;
     private int jumpsInAirReset = 2;
+    private AnimatedSprite animatedSprite;
 
     // Jump
     private bool inAir = false;
     [Export]
-    private int jumpPower = 700;
+    private int jumpPower = 300;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
         jumpsInAirReset = jumpsInAir;
+        animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -71,29 +66,6 @@ public class PlayerController : KinematicBody2D
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _PhysicsProcess(float delta)
     {
-        // Vector2 velocity = new Vector2();
-        // int direction = 0;
-        // if(Input.IsActionPressed("right")){
-        //     direction += 1;
-        // }
-        // if(Input.IsActionPressed("left") ){
-        //     direction -= 1;
-        // }
-        // if (direction != 0){
-        //     velocity.x = Mathf.Lerp(velocity.x, direction*speed, acceleration);
-        // } else {
-        //     velocity.x = Mathf.LerpAngle(velocity.x, 0, friction);
-        // }
-        // if(Input.IsActionJustPressed("jump")){
-        //     if(IsOnFloor()){
-        //         velocity.y -= jumpForce;
-        //     }
-        // }
-        // velocity.y += gravity * delta;
-
-        // MoveAndSlide(velocity, Vector2.Up);
-
-
         if (!IsOnFloor())
         {
             velocity.y += gravity * delta;
@@ -108,7 +80,19 @@ public class PlayerController : KinematicBody2D
             ProcessMovement(delta);
         }
         facingDirection = 0;
+
         MoveAndSlide(velocity, Vector2.Up);
+
+        if (inAir && previousPos.y < this.Position.y)
+        {
+            animatedSprite.Play("Falling");
+        }
+        else if (IsOnFloor() && Input.IsActionPressed("left") || Input.IsActionPressed("right"))
+        {
+            animatedSprite.Play("Run");
+        }
+
+        previousPos = this.Position;
     }
 
     private void ProcessMovement(float delta)
@@ -116,11 +100,13 @@ public class PlayerController : KinematicBody2D
         if (Input.IsActionPressed("left"))
         {
             facingDirection -= 1;
+            animatedSprite.FlipH = true;
             facingDirectionCheck -= 1;
         }
         if (Input.IsActionPressed("right"))
         {
             facingDirection += 1;
+            animatedSprite.FlipH = false;
             facingDirectionCheck += 1;
         }
 
@@ -139,13 +125,19 @@ public class PlayerController : KinematicBody2D
         {
             if (Input.IsActionJustPressed("jump"))
             {
+                inAir = true;
                 velocity.y = -jumpPower;
+                animatedSprite.Play("Jump");
             }
             else
             {
                 jumpsInAir = jumpsInAirReset;
                 inAir = false;
             }
+            // if (velocity.x <= 25 || velocity.x >= -25)
+            // {
+            //     animatedSprite.Play("Run");
+            // }
         }
 
         if (facingDirection != 0)
@@ -154,6 +146,10 @@ public class PlayerController : KinematicBody2D
         }
         else
         {
+            if (velocity.x < 25 && velocity.x > -25 && !inAir)
+            {
+                animatedSprite.Play("Idle");
+            }
             velocity.x = Mathf.Lerp(velocity.x, 0, friction);
         }
     }

@@ -25,6 +25,7 @@ public class PlayerController : KinematicBody2D
     private bool takingDamage = false;
     [Export]
     private int health = 1;
+    private int maxHealth;
     [Export]
     private int jumpsInAir = 2;
     private int jumpsInAirReset = 2;
@@ -43,6 +44,7 @@ public class PlayerController : KinematicBody2D
     {
         jumpsInAirReset = jumpsInAir;
         animatedSprite = GetNode<AnimatedSprite>("AnimatedSprite");
+        maxHealth = health;
     }
 
     // public void getDamage(int damage){
@@ -173,8 +175,14 @@ public class PlayerController : KinematicBody2D
                 health = 0;
                 animatedSprite.Stop();
                 Hide();
-                EmitSignal(nameof(Death));
+                GetTree().ChangeScene("Main.tscn");
             }
         }
+    }
+    public void respawnPlayer()
+    {
+        Show();
+        health = maxHealth;
+        velocity = new Vector2(0, 0);
     }
 }

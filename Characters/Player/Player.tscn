@@ -77,7 +77,6 @@ zoom = Vector2( 0.5, 0.5 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 10 )
 animation = "Idle"
-frame = 1
 playing = true
 
 [node name="Sprite" type="Sprite" parent="."]

@@ -155,9 +155,13 @@ public class PlayerController : KinematicBody2D
         }
         else
         {
-            if (velocity.x < 25 && velocity.x > -25 && !inAir)
+            if (velocity.x < 25 && velocity.x > -25)
             {
-                animatedSprite.Play("Idle");
+                if (!inAir)
+                {
+                    animatedSprite.Play("Idle");
+                }
+                takingDamage = false;
             }
             velocity.x = Mathf.Lerp(velocity.x, 0, friction);
         }
@@ -165,7 +169,7 @@ public class PlayerController : KinematicBody2D
 
     public void takeDamage()
     {
-        if (health > 0)
+        if (health > 0 && !takingDamage)
         {
             takingDamage = true;
             health--;

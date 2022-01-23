@@ -18,34 +18,40 @@ public class Crab : KinematicBody2D
     {
         crab = GetNode<Sprite>("Crab");
         bottomLeft = GetNode<RayCast2D>("LeftRaycast");
-        bottomRight = GetNode<RayCast2D>("RightRaycast") ;
+        bottomRight = GetNode<RayCast2D>("RightRaycast");
         velocity.x = speed;
 
-        
+
     }
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-  public override void _PhysicsProcess(float delta)
-  {
-      velocity.y += gravity * delta;
-      if (velocity.y > gravity){
-          velocity.y = gravity;
-      }
-      if (!bottomRight.IsColliding()) {
-          velocity.x = -speed;
-      }
-      if (!bottomLeft.IsColliding()) {
-          velocity.x = speed;
-      }
-      MoveAndSlide(velocity, Vector2.Up);
-  }
-//   private void hitboxHit(object body)
-// {
-//     if(body.GetType().Name.ToString()=="Player"){
-        
-//         GetNode<PlayerController>("../Player/PlayerController") as PlayerController;
-//         PlayerController.getDamage(damage);
+    //  // Called every frame. 'delta' is the elapsed time since the previous frame.
+    public override void _PhysicsProcess(float delta)
+    {
+        velocity.y += gravity * delta;
+        if (velocity.y > gravity)
+        {
+            velocity.y = gravity;
+        }
+        if (!bottomRight.IsColliding())
+        {
+            velocity.x = -speed;
+        }
+        if (!bottomLeft.IsColliding())
+        {
+            velocity.x = speed;
+        }
+        MoveAndSlide(velocity, Vector2.Up);
+    }
 
-//     }
-// }
+    private void hitboxHit(object body)
+    {
+        if (body is KinematicBody2D)
+        {
+            if (body is PlayerController)
+            {
+                PlayerController pc = body as PlayerController;
+                pc.takeDamage();
+            }
+        }
+    }
 }

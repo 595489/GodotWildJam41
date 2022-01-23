@@ -35,6 +35,8 @@ public class PlayerController : KinematicBody2D
     [Export]
     private int jumpPower = 300;
     private Godot.KinematicBody2D characterArea;
+    [Signal]
+    public delegate void Death();
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
@@ -156,6 +158,23 @@ public class PlayerController : KinematicBody2D
                 animatedSprite.Play("Idle");
             }
             velocity.x = Mathf.Lerp(velocity.x, 0, friction);
+        }
+    }
+
+    public void takeDamage()
+    {
+        if (health > 0)
+        {
+            takingDamage = true;
+            health--;
+            velocity = MoveAndSlide(new Vector2(400f * -facingDirectionCheck, -80));
+            if (health <= 0)
+            {
+                health = 0;
+                animatedSprite.Stop();
+                Hide();
+                EmitSignal(nameof(Death));
+            }
         }
     }
 }
